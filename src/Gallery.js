@@ -18,7 +18,7 @@ const Gallery = React.memo(function Gallery({
 }) {
   const [containerWidth, setContainerWidth] = useState(0);
   const galleryEl = useRef(null);
-
+  /*
   useLayoutEffect(() => {
     let animationFrameID = null;
     const observer = new ResizeObserver(entries => {
@@ -37,7 +37,7 @@ const Gallery = React.memo(function Gallery({
       observer.disconnect();
       window.cancelAnimationFrame(animationFrameID);
     };
-  });
+  });*/
 
   const handleClick = (event, { index }) => {
     onClick(event, {
