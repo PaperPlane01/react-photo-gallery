@@ -576,7 +576,7 @@
       ref: galleryEl
     }, "\xA0"); // subtract 1 pixel because the browser may round up a pixel
 
-    var width = containerWidth - 1;
+    var width = usedContainerWidth - 1;
     var galleryStyle, thumbs;
 
     if (direction === 'row') {
@@ -593,7 +593,7 @@
       if (limitNodeSearch === undefined) {
         limitNodeSearch = 2;
 
-        if (containerWidth >= 450) {
+        if (usedContainerWidth >= 450) {
           limitNodeSearch = findIdealNodeSearch({
             containerWidth: usedContainerWidth,
             targetRowHeight: targetRowHeight
