@@ -72,7 +72,7 @@ const Gallery = React.memo(function Gallery({
     // set how many neighboring nodes the graph will visit
     if (limitNodeSearch === undefined) {
       limitNodeSearch = 2;
-      if (containerWidth >= 450) {
+      if (usedContainerWidth >= 450) {
         limitNodeSearch = findIdealNodeSearch({ containerWidth: usedContainerWidth, targetRowHeight });
       }
     }
