@@ -58,7 +58,7 @@ const Gallery = React.memo(function Gallery({
   // no containerWidth until after first render with refs, skip calculations and render nothing
   if (!usedContainerWidth) return <div ref={galleryEl}>&nbsp;</div>;
   // subtract 1 pixel because the browser may round up a pixel
-  const width = containerWidth - 1;
+  const width = usedContainerWidth - 1;
   let galleryStyle, thumbs;
 
   if (direction === 'row') {
