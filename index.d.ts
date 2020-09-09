@@ -112,7 +112,20 @@ export interface GalleryProps<CustomPhotoProps extends object = {}> {
    */
   direction?: string
 
-  renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
+  renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>,
+
+  /**
+   * specify whether to use parent container width;
+   * if user wants to use parent container width, then its value
+   * must be provided with parentContainerWidth prop
+   */
+  useParentContainerWidth?: boolean,
+
+  /**
+   * parent container width which must be provided
+   * if useParentContainerWidth prop is set to true
+   */
+  parentContainerWidth?: number
 }
 
 export type GalleryI<

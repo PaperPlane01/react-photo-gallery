@@ -15,29 +15,36 @@ const Gallery = React.memo(function Gallery({
   targetRowHeight,
   columns,
   renderImage,
+  useParentContainerWidth,
+  parentContainerWidth,
 }) {
   const [containerWidth, setContainerWidth] = useState(0);
   const galleryEl = useRef(null);
-  /*
+
   useLayoutEffect(() => {
-    let animationFrameID = null;
-    const observer = new ResizeObserver(entries => {
-      // only do something if width changes
-      const newWidth = entries[0].contentRect.width;
-      if (containerWidth !== newWidth) {
-        // put in an animation frame to stop "benign errors" from
-        // ResizObserver https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
-        animationFrameID = window.requestAnimationFrame(() => {
-          setContainerWidth(Math.floor(newWidth));
-        });
-      }
-    });
-    observer.observe(galleryEl.current);
-    return () => {
-      observer.disconnect();
-      window.cancelAnimationFrame(animationFrameID);
-    };
-  });*/
+    if (!useParentContainerWidth) {
+      let animationFrameID = null;
+      const observer = new ResizeObserver(entries => {
+        // only do something if width changes
+        const newWidth = entries[0].contentRect.width;
+        if (containerWidth !== newWidth) {
+          // put in an animation frame to stop "benign errors" from
+          // ResizObserver https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+          animationFrameID = window.requestAnimationFrame(() => {
+            setContainerWidth(Math.floor(newWidth));
+          });
+        }
+      });
+      observer.observe(galleryEl.current);
+      return () => {
+        observer.disconnect();
+        window.cancelAnimationFrame(animationFrameID);
+      };
+    }
+  });
+
+  // Choose container width passed by user or use calculated container width
+  const usedContainerWidth = useParentContainerWidth ? parentContainerWidth : containerWidth;
 
   const handleClick = (event, { index }) => {
     onClick(event, {
@@ -49,7 +56,7 @@ const Gallery = React.memo(function Gallery({
   };
 
   // no containerWidth until after first render with refs, skip calculations and render nothing
-  if (!containerWidth) return <div ref={galleryEl}>&nbsp;</div>;
+  if (!usedContainerWidth) return <div ref={galleryEl}>&nbsp;</div>;
   // subtract 1 pixel because the browser may round up a pixel
   const width = containerWidth - 1;
   let galleryStyle, thumbs;
@@ -57,16 +64,16 @@ const Gallery = React.memo(function Gallery({
   if (direction === 'row') {
     // allow user to calculate limitNodeSearch from containerWidth
     if (typeof limitNodeSearch === 'function') {
-      limitNodeSearch = limitNodeSearch(containerWidth);
+      limitNodeSearch = limitNodeSearch(usedContainerWidth);
     }
     if (typeof targetRowHeight === 'function') {
-      targetRowHeight = targetRowHeight(containerWidth);
+      targetRowHeight = targetRowHeight(usedContainerWidth);
     }
     // set how many neighboring nodes the graph will visit
     if (limitNodeSearch === undefined) {
       limitNodeSearch = 2;
       if (containerWidth >= 450) {
-        limitNodeSearch = findIdealNodeSearch({ containerWidth, targetRowHeight });
+        limitNodeSearch = findIdealNodeSearch({ containerWidth: usedContainerWidth, targetRowHeight });
       }
     }
 
@@ -76,14 +83,14 @@ const Gallery = React.memo(function Gallery({
   if (direction === 'column') {
     // allow user to calculate columns from containerWidth
     if (typeof columns === 'function') {
-      columns = columns(containerWidth);
+      columns = columns(usedContainerWidth);
     }
     // set default breakpoints if user doesn't specify columns prop
     if (columns === undefined) {
       columns = 1;
-      if (containerWidth >= 500) columns = 2;
-      if (containerWidth >= 900) columns = 3;
-      if (containerWidth >= 1500) columns = 4;
+      if (usedContainerWidth >= 500) columns = 2;
+      if (usedContainerWidth >= 900) columns = 3;
+      if (usedContainerWidth >= 1500) columns = 4;
     }
     galleryStyle = { position: 'relative' };
     thumbs = computeColumnLayout({ containerWidth: width, columns, margin, photos });
@@ -122,12 +129,16 @@ Gallery.propTypes = {
   limitNodeSearch: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
   margin: PropTypes.number,
   renderImage: PropTypes.func,
+  usedParentContainerWidth: PropTypes.bool,
+  parentContainerWidth: PropTypes.number,
 };
 
 Gallery.defaultProps = {
   margin: 2,
   direction: 'row',
   targetRowHeight: 300,
+  usedParentContainerWidth: false,
+  parentContainerWidth: undefined,
 };
 export { Photo };
 export default Gallery;
